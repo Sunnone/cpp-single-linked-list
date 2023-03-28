@@ -266,10 +266,9 @@ public:
         assert(pos.node_);
         if (size_ > 0) {
             auto erase = std::exchange(pos.node_->next_node, pos.node_->next_node ->next_node);
-            auto iter = erase->next_node;
             delete erase;
             --size_;
-            return Iterator{ iter };
+            return Iterator{ pos.node_->next_node };
         }
         else {
             return end();
