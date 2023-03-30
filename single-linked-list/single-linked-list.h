@@ -154,7 +154,6 @@ public:
     // Константный итератор, предоставляющий доступ для чтения к элементам списка
     using ConstIterator = BasicIterator<const Type>;
 
-
     SingleLinkedList& operator=(const SingleLinkedList& rhs) {
         if (this != &rhs) {
             SingleLinkedList tmp(rhs);
@@ -163,7 +162,6 @@ public:
         }
         return *this;
     }
-
 
     // Обменивает содержимое списков за время O(1)
     void swap(SingleLinkedList& other) noexcept {
@@ -255,8 +253,7 @@ public:
         assert(pos.node_->next_node);
         delete std::exchange(pos.node_->next_node, pos.node_->next_node ->next_node);
         --size_;
-        return Iterator{ pos.node_->next_node };
-       
+        return Iterator{ pos.node_->next_node };       
     }
 
     void PushFront(const Type& value) {
