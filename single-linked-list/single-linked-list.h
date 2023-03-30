@@ -65,8 +65,8 @@ class SingleLinkedList {
 
         // Оператор сравнения итераторов (в роли второго аргумента выступает константный итератор)
         // Два итератора равны, если они ссылаются на один и тот же элемент списка либо на end()
-        [[nodiscard]] bool operator==(const BasicIterator<const Type>& rhs) const noexcept {
-
+        template<typename It_Type>
+        [[nodiscard]] bool operator==(const BasicIterator<It_Type>& rhs) const noexcept {
             return node_ == rhs.node_;
         }
 
@@ -74,17 +74,8 @@ class SingleLinkedList {
         // Противоположен !=
         template<typename It_Type>
         [[nodiscard]] bool operator!=(const BasicIterator<It_Type>& rhs) const noexcept {
-            return node_ == rhs.node_ ? false : true;
+            return !(node_ == rhs.node_);
         }
-
-        // Оператор сравнения итераторов (в роли второго аргумента итератор)
-        // Два итератора равны, если они ссылаются на один и тот же элемент списка либо на end()
-        [[nodiscard]] bool operator==(const BasicIterator<Type>& rhs) const noexcept {
-            return node_ == rhs.node_;
-        }
-
-       
-      
 
         // Оператор прединкремента. После его вызова итератор указывает на следующий элемент списка
         // Возвращает ссылку на самого себя
@@ -252,10 +243,7 @@ public:
 
     void PopFront() noexcept {
         assert(size_ > 0);
-        auto pop = head_.next_node;
-        head_.next_node = pop->next_node;
-        delete pop;
-        --size_;
+        EraseAfter(before_begin());
     }
 
     /*
@@ -264,15 +252,11 @@ public:
      */
     Iterator EraseAfter(ConstIterator pos) noexcept {
         assert(pos.node_);
-        if (size_ > 0) {
-            auto erase = std::exchange(pos.node_->next_node, pos.node_->next_node ->next_node);
-            delete erase;
-            --size_;
-            return Iterator{ pos.node_->next_node };
-        }
-        else {
-            return end();
-        }
+        assert(pos.node_->next_node);
+        delete std::exchange(pos.node_->next_node, pos.node_->next_node ->next_node);
+        --size_;
+        return Iterator{ pos.node_->next_node };
+       
     }
 
     void PushFront(const Type& value) {
@@ -321,8 +305,7 @@ bool operator!=(const SingleLinkedList<Type>& lhs, const SingleLinkedList<Type>&
 
 template <typename Type>
 bool operator<(const SingleLinkedList<Type>& lhs, const SingleLinkedList<Type>& rhs) {
-    bool f = std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
-    return f;
+    return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
 }
 
 template <typename Type>
